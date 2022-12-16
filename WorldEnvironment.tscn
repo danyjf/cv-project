@@ -1,0 +1,622 @@
+[gd_scene load_steps=81 format=2]
+
+[ext_resource path="res://space.jpg" type="Texture" id=1]
+[ext_resource path="res://models/planet.obj" type="ArrayMesh" id=2]
+[ext_resource path="res://textures/mars_texture.jpg" type="Texture" id=3]
+[ext_resource path="res://textures/sun_texture.png" type="Texture" id=4]
+[ext_resource path="res://normal_maps/venus_normal.jpg" type="Texture" id=5]
+[ext_resource path="res://textures/earth_texture.jpg" type="Texture" id=6]
+[ext_resource path="res://normal_maps/mars_normal.jpg" type="Texture" id=7]
+[ext_resource path="res://textures/moon_texture.jpg" type="Texture" id=8]
+[ext_resource path="res://normal_maps/moon_normal.jpg" type="Texture" id=9]
+[ext_resource path="res://normal_maps/earth_normal.jpg" type="Texture" id=10]
+[ext_resource path="res://normal_maps/mercury_normal.jpg" type="Texture" id=11]
+[ext_resource path="res://textures/mercury_texture.jpg" type="Texture" id=12]
+[ext_resource path="res://models/saturn_ring.obj" type="ArrayMesh" id=13]
+[ext_resource path="res://textures/jupiter_texture.jpg" type="Texture" id=14]
+[ext_resource path="res://height_maps/jupiter_height.jpg" type="Texture" id=15]
+[ext_resource path="res://height_maps/saturn_ring_height.jpg" type="Texture" id=16]
+[ext_resource path="res://textures/saturn_texture.jpg" type="Texture" id=17]
+[ext_resource path="res://height_maps/saturn_height.jpg" type="Texture" id=18]
+[ext_resource path="res://textures/saturn_ring_texture.jpg" type="Texture" id=19]
+[ext_resource path="res://height_maps/neptune_height.jpg" type="Texture" id=20]
+[ext_resource path="res://height_maps/pluto_height.jpg" type="Texture" id=21]
+[ext_resource path="res://textures/pluto_texture.jpg" type="Texture" id=22]
+[ext_resource path="res://textures/neptune_texture.jpg" type="Texture" id=25]
+[ext_resource path="res://textures/venus_texture.jpg" type="Texture" id=26]
+[ext_resource path="res://scripts/Mercury.gd" type="Script" id=27]
+[ext_resource path="res://scripts/Position3D.gd" type="Script" id=28]
+[ext_resource path="res://scripts/Sun.gd" type="Script" id=29]
+[ext_resource path="res://scripts/Venus.gd" type="Script" id=30]
+[ext_resource path="res://scripts/Position3D2.gd" type="Script" id=31]
+[ext_resource path="res://scripts/Position3D3.gd" type="Script" id=32]
+[ext_resource path="res://scripts/Earth.gd" type="Script" id=33]
+[ext_resource path="res://scripts/Position3D4.gd" type="Script" id=34]
+[ext_resource path="res://scripts/Moon.gd" type="Script" id=35]
+[ext_resource path="res://scripts/Position3D5.gd" type="Script" id=36]
+[ext_resource path="res://scripts/Mars.gd" type="Script" id=37]
+[ext_resource path="res://scripts/Position3D6.gd" type="Script" id=38]
+[ext_resource path="res://scripts/Jupiter.gd" type="Script" id=39]
+[ext_resource path="res://scripts/Position3D7.gd" type="Script" id=40]
+[ext_resource path="res://scripts/Saturn.gd" type="Script" id=41]
+[ext_resource path="res://scripts/Uranus.gd" type="Script" id=42]
+[ext_resource path="res://scripts/Position3D8.gd" type="Script" id=43]
+[ext_resource path="res://scripts/Position3D9.gd" type="Script" id=44]
+[ext_resource path="res://scripts/Neptune.gd" type="Script" id=45]
+[ext_resource path="res://scripts/Position3D10.gd" type="Script" id=46]
+[ext_resource path="res://scripts/Pluto.gd" type="Script" id=47]
+[ext_resource path="res://models/Spaceship.obj" type="ArrayMesh" id=48]
+[ext_resource path="res://scripts/Ship.gd" type="Script" id=49]
+[ext_resource path="res://normal_maps/sun_normal.png" type="Texture" id=50]
+
+[sub_resource type="PanoramaSky" id=1]
+panorama = ExtResource( 1 )
+
+[sub_resource type="Environment" id=2]
+background_mode = 2
+background_sky = SubResource( 1 )
+glow_strength = 1.38
+glow_blend_mode = 1
+glow_bicubic_upscale = true
+
+[sub_resource type="SpatialMaterial" id=22]
+params_diffuse_mode = 4
+albedo_texture = ExtResource( 4 )
+normal_enabled = true
+normal_scale = 16.0
+normal_texture = ExtResource( 50 )
+
+[sub_resource type="BoxShape" id=23]
+extents = Vector3( 2.72508, 1.48515, 3.61304 )
+
+[sub_resource type="SphereShape" id=24]
+
+[sub_resource type="SpatialMaterial" id=3]
+albedo_texture = ExtResource( 12 )
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource( 11 )
+
+[sub_resource type="SphereShape" id=25]
+
+[sub_resource type="SpatialMaterial" id=4]
+albedo_texture = ExtResource( 26 )
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource( 5 )
+
+[sub_resource type="SphereShape" id=26]
+
+[sub_resource type="SpatialMaterial" id=5]
+albedo_texture = ExtResource( 6 )
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource( 10 )
+
+[sub_resource type="SphereShape" id=27]
+
+[sub_resource type="SpatialMaterial" id=6]
+albedo_texture = ExtResource( 8 )
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource( 9 )
+
+[sub_resource type="SphereShape" id=28]
+
+[sub_resource type="SpatialMaterial" id=7]
+albedo_texture = ExtResource( 3 )
+normal_enabled = true
+normal_scale = 1.0
+normal_texture = ExtResource( 7 )
+
+[sub_resource type="SphereShape" id=29]
+
+[sub_resource type="Shader" id=10]
+code = "shader_type spatial;
+
+uniform float height;
+uniform sampler2D heightMap;
+uniform sampler2D imageTexture;
+
+void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	if (VERTEX.x >= 0.0){
+		VERTEX.x += h;
+	} else {
+		VERTEX.x -= h;
+	}
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	if (VERTEX.z >= 0.0){
+		VERTEX.z += h;
+	} else {
+		VERTEX.z -= h;
+	}
+	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+}
+
+void fragment() {
+	ALBEDO = texture(imageTexture, UV).rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=9]
+shader = SubResource( 10 )
+shader_param/height = 0.065
+shader_param/heightMap = ExtResource( 15 )
+shader_param/imageTexture = ExtResource( 14 )
+
+[sub_resource type="SphereShape" id=30]
+radius = 1.0918
+
+[sub_resource type="Shader" id=11]
+code = "shader_type spatial;
+
+uniform float height;
+uniform sampler2D heightMap;
+uniform sampler2D imageTexture;
+varying flat vec3 color;
+
+void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	if (VERTEX.x >= 0.0){
+		VERTEX.x += h;
+	} else {
+		VERTEX.x -= h;
+	}
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	if (VERTEX.z >= 0.0){
+		VERTEX.z += h;
+	} else {
+		VERTEX.z -= h;
+	}
+	color = texture(imageTexture, UV).rgb;
+}
+
+void fragment() {
+	ALBEDO = color;
+}
+
+uniform vec3 diffuseComponent;
+uniform vec3 specularComponent;
+uniform float specularStrength;
+uniform float shininess;
+
+void light() {
+	DIFFUSE_LIGHT += max(dot(NORMAL, LIGHT), 0.0) * diffuseComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+	vec3 reflectDir = reflect(-LIGHT, NORMAL);
+	float spec = pow(max(dot(-VIEW, reflectDir), 0.0), shininess);
+	SPECULAR_LIGHT += specularStrength * spec * specularComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+}"
+
+[sub_resource type="ShaderMaterial" id=12]
+shader = SubResource( 11 )
+shader_param/height = 0.164
+shader_param/diffuseComponent = Vector3( 0.1, 0.1, 0.1 )
+shader_param/specularComponent = Vector3( 0, 0, 0 )
+shader_param/specularStrength = 0.5
+shader_param/shininess = 30.0
+shader_param/heightMap = ExtResource( 18 )
+shader_param/imageTexture = ExtResource( 17 )
+
+[sub_resource type="Shader" id=13]
+code = "shader_type spatial;
+
+uniform float height;
+uniform sampler2D heightMap;
+uniform sampler2D imageTexture;
+varying flat vec3 color;
+
+void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	color = texture(imageTexture, UV).rgb;
+}
+
+void fragment() {
+	ALBEDO = color;
+}
+
+uniform vec3 diffuseComponent;
+uniform vec3 specularComponent;
+uniform float specularStrength;
+uniform float shininess;
+
+void light() {
+	DIFFUSE_LIGHT += max(dot(NORMAL, LIGHT), 0.0) * diffuseComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+	vec3 reflectDir = reflect(-LIGHT, NORMAL);
+	float spec = pow(max(dot(-VIEW, reflectDir), 0.0), shininess);
+	SPECULAR_LIGHT += specularStrength * spec * specularComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+}"
+
+[sub_resource type="ShaderMaterial" id=14]
+shader = SubResource( 13 )
+shader_param/height = 0.65
+shader_param/diffuseComponent = Vector3( 0.1, 0.1, 0.1 )
+shader_param/specularComponent = null
+shader_param/specularStrength = 0.5
+shader_param/shininess = 0.1
+shader_param/heightMap = ExtResource( 16 )
+shader_param/imageTexture = ExtResource( 19 )
+
+[sub_resource type="SphereShape" id=31]
+
+[sub_resource type="Shader" id=35]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
+uniform float shininess : hint_range(0.0, 200.0) = 70;
+
+void vertex() {
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	COLOR = max(ambient, diffuse + specular);
+}
+
+void fragment() {
+	ALBEDO = COLOR.rgb;
+}
+
+//uniform float height;
+//uniform sampler2D heightMap;
+//uniform sampler2D imageTexture;
+//
+//varying vec3 color;
+//
+//void vertex() {
+//	float h = texture(heightMap, UV).g * height;
+//
+//	if (VERTEX.x >= 0.0){
+//		VERTEX.x += h;
+//	} else {
+//		VERTEX.x -= h;
+//	}
+//	if (VERTEX.y >= 0.0){
+//		VERTEX.y += h;
+//	} else {
+//		VERTEX.y -= h;
+//	}
+//	if (VERTEX.z >= 0.0){
+//		VERTEX.z += h;
+//	} else {
+//		VERTEX.z -= h;
+//	}
+//	color = texture(imageTexture, UV).rgb;
+//}
+//
+//void fragment() {
+//	ALBEDO = color;
+//}
+//
+//uniform vec3 diffuseComponent;
+//uniform vec3 specularComponent;
+//uniform float specularStrength;
+//uniform float shininess;
+//
+//void light() {
+//	DIFFUSE_LIGHT += max(dot(NORMAL, LIGHT), 0.0) * diffuseComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+//	vec3 reflectDir = reflect(-LIGHT, NORMAL);
+//	float spec = pow(max(dot(-VIEW, reflectDir), 0.0), shininess);
+//	SPECULAR_LIGHT += specularStrength * spec * specularComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
+//}
+"
+
+[sub_resource type="ShaderMaterial" id=16]
+shader = SubResource( 35 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.0215, 0.1745, 0.0215, 0.55 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.07568, 0.61424, 0.07568, 0.55 )
+shader_param/specularColor = Color( 0.633, 0.727811, 0.633, 0.55 )
+shader_param/specularStrength = 0.5
+shader_param/shininess = 70.0
+
+[sub_resource type="SphereShape" id=32]
+radius = 1.08178
+
+[sub_resource type="Shader" id=18]
+code = "shader_type spatial;
+
+uniform float height;
+uniform sampler2D heightMap;
+uniform sampler2D imageTexture;
+
+void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	
+	if (VERTEX.x >= 0.0){
+		VERTEX.x += h;
+	} else {
+		VERTEX.x -= h;
+	}
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	if (VERTEX.z >= 0.0){
+		VERTEX.z += h;
+	} else {
+		VERTEX.z -= h;
+	}
+	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+}
+
+void fragment() {
+	ALBEDO = texture(imageTexture, UV).rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=19]
+shader = SubResource( 18 )
+shader_param/height = 0.081
+shader_param/heightMap = ExtResource( 20 )
+shader_param/imageTexture = ExtResource( 25 )
+
+[sub_resource type="SphereShape" id=33]
+radius = 1.0754
+
+[sub_resource type="Shader" id=20]
+code = "shader_type spatial;
+
+uniform float height;
+uniform sampler2D heightMap;
+uniform sampler2D imageTexture;
+
+void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	
+	if (VERTEX.x >= 0.0){
+		VERTEX.x += h;
+	} else {
+		VERTEX.x -= h;
+	}
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	if (VERTEX.z >= 0.0){
+		VERTEX.z += h;
+	} else {
+		VERTEX.z -= h;
+	}
+	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+}
+
+void fragment() {
+	ALBEDO = texture(imageTexture, UV).rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id=21]
+shader = SubResource( 20 )
+shader_param/height = -1.028
+shader_param/heightMap = ExtResource( 21 )
+shader_param/imageTexture = ExtResource( 22 )
+
+[sub_resource type="SphereShape" id=34]
+
+[node name="WorldEnvironment" type="WorldEnvironment"]
+environment = SubResource( 2 )
+
+[node name="TestLight (remove later)" type="SpotLight" parent="."]
+transform = Transform( -1.20829e-09, 1, 4.36947e-08, -0.0276425, -4.37114e-08, 0.999618, 0.999618, 0, 0.0276425, 71.915, 12.0939, 2.31034 )
+visible = false
+light_energy = 2.18
+light_specular = 0.0
+shadow_enabled = true
+spot_range = 42.9877
+spot_angle = 59.0625
+
+[node name="Ship" type="KinematicBody" parent="."]
+transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 48.3604 )
+script = ExtResource( 49 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Ship"]
+mesh = ExtResource( 48 )
+material/0 = SubResource( 22 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Ship"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.980408, -1.71164 )
+shape = SubResource( 23 )
+
+[node name="Camera" type="ClippedCamera" parent="Ship"]
+transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 5.01986, 14.7959 )
+
+[node name="Sun" type="KinematicBody" parent="."]
+transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0 )
+script = ExtResource( 29 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Sun"]
+cast_shadow = 0
+mesh = ExtResource( 2 )
+material/0 = SubResource( 22 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Sun"]
+shape = SubResource( 24 )
+
+[node name="OmniLight" type="OmniLight" parent="Sun"]
+transform = Transform( 0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0 )
+light_specular = 0.0
+shadow_enabled = true
+omni_range = 447.995
+
+[node name="Position3D" type="Position3D" parent="."]
+script = ExtResource( 28 )
+
+[node name="Mercury" type="KinematicBody" parent="Position3D"]
+transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 25.4361, 0, 0 )
+script = ExtResource( 27 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D/Mercury"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 3 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D/Mercury"]
+shape = SubResource( 25 )
+
+[node name="Position3D2" type="Position3D" parent="."]
+script = ExtResource( 31 )
+
+[node name="Venus" type="KinematicBody" parent="Position3D2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 30.3317, 0, 0 )
+script = ExtResource( 30 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D2/Venus"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 4 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D2/Venus"]
+shape = SubResource( 26 )
+
+[node name="Position3D3" type="Position3D" parent="."]
+script = ExtResource( 32 )
+
+[node name="Earth" type="KinematicBody" parent="Position3D3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 35.1163, 0, 0 )
+script = ExtResource( 33 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D3/Earth"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 5 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D3/Earth"]
+shape = SubResource( 27 )
+
+[node name="Position3D4" type="Position3D" parent="Position3D3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 35.116, 0, 0 )
+script = ExtResource( 34 )
+
+[node name="Moon" type="KinematicBody" parent="Position3D3/Position3D4"]
+transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 1.47131, 0.943319, 0 )
+script = ExtResource( 35 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D3/Position3D4/Moon"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 6 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D3/Position3D4/Moon"]
+shape = SubResource( 28 )
+
+[node name="Position3D5" type="Position3D" parent="."]
+script = ExtResource( 36 )
+
+[node name="Mars" type="KinematicBody" parent="Position3D5"]
+transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 39.9321, 0, 0 )
+script = ExtResource( 37 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D5/Mars"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 7 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D5/Mars"]
+shape = SubResource( 29 )
+
+[node name="Position3D6" type="Position3D" parent="."]
+script = ExtResource( 38 )
+
+[node name="Jupiter" type="KinematicBody" parent="Position3D6"]
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 51.7395, 0, 0 )
+script = ExtResource( 39 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D6/Jupiter"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 9 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D6/Jupiter"]
+shape = SubResource( 30 )
+
+[node name="Position3D7" type="Position3D" parent="."]
+script = ExtResource( 40 )
+
+[node name="Saturn" type="KinematicBody" parent="Position3D7"]
+transform = Transform( 4.5, 0, 0, 0, 4.5, 0, 0, 0, 4.5, 71.6055, 0, 0 )
+script = ExtResource( 41 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D7/Saturn"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 12 )
+
+[node name="MeshInstance2" type="MeshInstance" parent="Position3D7/Saturn"]
+transform = Transform( 1, 0, 0, 0, 0.2, 0, 0, 0, 1, 0, 0, 0 )
+mesh = ExtResource( 13 )
+material/0 = SubResource( 14 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D7/Saturn"]
+transform = Transform( 2, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0 )
+shape = SubResource( 31 )
+
+[node name="Position3D8" type="Position3D" parent="."]
+script = ExtResource( 43 )
+
+[node name="Uranus" type="KinematicBody" parent="Position3D8"]
+transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 87.3267, 0, -50.02 )
+script = ExtResource( 42 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D8/Uranus"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 16 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D8/Uranus"]
+shape = SubResource( 32 )
+
+[node name="Position3D9" type="Position3D" parent="."]
+script = ExtResource( 44 )
+
+[node name="Neptune" type="KinematicBody" parent="Position3D9"]
+transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 93.2792, 0, 0 )
+script = ExtResource( 45 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D9/Neptune"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 19 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D9/Neptune"]
+shape = SubResource( 33 )
+
+[node name="Position3D10" type="Position3D" parent="."]
+script = ExtResource( 46 )
+
+[node name="Pluto" type="KinematicBody" parent="Position3D10"]
+transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 98.784, 0, 0 )
+script = ExtResource( 47 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Position3D10/Pluto"]
+mesh = ExtResource( 2 )
+material/0 = SubResource( 21 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Position3D10/Pluto"]
+shape = SubResource( 34 )
