@@ -1,4 +1,4 @@
-[gd_scene load_steps=81 format=2]
+[gd_scene load_steps=82 format=2]
 
 [ext_resource path="res://space.jpg" type="Texture" id=1]
 [ext_resource path="res://models/planet.obj" type="ArrayMesh" id=2]
@@ -22,6 +22,7 @@
 [ext_resource path="res://height_maps/neptune_height.jpg" type="Texture" id=20]
 [ext_resource path="res://height_maps/pluto_height.jpg" type="Texture" id=21]
 [ext_resource path="res://textures/pluto_texture.jpg" type="Texture" id=22]
+[ext_resource path="res://textures/uranus_texture.jpg" type="Texture" id=23]
 [ext_resource path="res://textures/neptune_texture.jpg" type="Texture" id=25]
 [ext_resource path="res://textures/venus_texture.jpg" type="Texture" id=26]
 [ext_resource path="res://scripts/Mercury.gd" type="Script" id=27]
@@ -255,6 +256,8 @@ shader_param/imageTexture = ExtResource( 19 )
 code = "shader_type spatial;
 render_mode unshaded;
 
+uniform sampler2D imageTexture;
+
 uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
 uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
@@ -288,7 +291,8 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = COLOR.rgb;
+//	ALBEDO = COLOR.rgb;
+	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
 }
 
 //uniform float height;
@@ -338,12 +342,13 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id=16]
 shader = SubResource( 35 )
 shader_param/lightColor = Color( 1, 1, 1, 1 )
-shader_param/ambientColor = Color( 0.0215, 0.1745, 0.0215, 0.55 )
+shader_param/ambientColor = Color( 0.34902, 0.658824, 0.662745, 0.54902 )
 shader_param/ambientStrength = 0.2
-shader_param/diffuseColor = Color( 0.07568, 0.61424, 0.07568, 0.55 )
-shader_param/specularColor = Color( 0.633, 0.727811, 0.633, 0.55 )
-shader_param/specularStrength = 0.5
-shader_param/shininess = 70.0
+shader_param/diffuseColor = Color( 0.368627, 0.756863, 0.686275, 0.54902 )
+shader_param/specularColor = Color( 1, 1, 1, 1 )
+shader_param/specularStrength = 2.0
+shader_param/shininess = 15.0
+shader_param/imageTexture = ExtResource( 23 )
 
 [sub_resource type="SphereShape" id=32]
 radius = 1.08178
