@@ -1,4 +1,4 @@
-[gd_scene load_steps=82 format=2]
+[gd_scene load_steps=83 format=2]
 
 [ext_resource path="res://space.jpg" type="Texture" id=1]
 [ext_resource path="res://models/planet.obj" type="ArrayMesh" id=2]
@@ -23,6 +23,7 @@
 [ext_resource path="res://height_maps/pluto_height.jpg" type="Texture" id=21]
 [ext_resource path="res://textures/pluto_texture.jpg" type="Texture" id=22]
 [ext_resource path="res://textures/uranus_texture.jpg" type="Texture" id=23]
+[ext_resource path="res://height_maps/uranus_height.jpg" type="Texture" id=24]
 [ext_resource path="res://textures/neptune_texture.jpg" type="Texture" id=25]
 [ext_resource path="res://textures/venus_texture.jpg" type="Texture" id=26]
 [ext_resource path="res://scripts/Mercury.gd" type="Script" id=27]
@@ -257,6 +258,7 @@ code = "shader_type spatial;
 render_mode unshaded;
 
 uniform sampler2D imageTexture;
+uniform sampler2D heightMap;
 
 uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
@@ -265,8 +267,26 @@ uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
 uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
+uniform float height : hint_range(0.0, 1.0) = 0.2;
 
 void vertex() {
+	float h = texture(heightMap, UV).g * height;
+	if (VERTEX.x >= 0.0){
+		VERTEX.x += h;
+	} else {
+		VERTEX.x -= h;
+	}
+	if (VERTEX.y >= 0.0){
+		VERTEX.y += h;
+	} else {
+		VERTEX.y -= h;
+	}
+	if (VERTEX.z >= 0.0){
+		VERTEX.z += h;
+	} else {
+		VERTEX.z -= h;
+	}
+	
 	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
 	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
@@ -342,13 +362,15 @@ void fragment() {
 [sub_resource type="ShaderMaterial" id=16]
 shader = SubResource( 35 )
 shader_param/lightColor = Color( 1, 1, 1, 1 )
-shader_param/ambientColor = Color( 0.34902, 0.658824, 0.662745, 0.54902 )
+shader_param/ambientColor = Color( 0.368627, 0.709804, 0.756863, 0.54902 )
 shader_param/ambientStrength = 0.2
-shader_param/diffuseColor = Color( 0.368627, 0.756863, 0.686275, 0.54902 )
+shader_param/diffuseColor = Color( 0.368627, 0.721569, 0.756863, 0.54902 )
 shader_param/specularColor = Color( 1, 1, 1, 1 )
 shader_param/specularStrength = 2.0
 shader_param/shininess = 15.0
+shader_param/height = 0.3
 shader_param/imageTexture = ExtResource( 23 )
+shader_param/heightMap = ExtResource( 24 )
 
 [sub_resource type="SphereShape" id=32]
 radius = 1.08178
@@ -588,7 +610,7 @@ shape = SubResource( 31 )
 script = ExtResource( 43 )
 
 [node name="Uranus" type="KinematicBody" parent="Position3D8"]
-transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 87.3267, 0, -50.02 )
+transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 87.327, 0, 0 )
 script = ExtResource( 42 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Position3D8/Uranus"]
