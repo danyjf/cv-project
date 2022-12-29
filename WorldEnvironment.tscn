@@ -311,52 +311,8 @@ void vertex() {
 }
 
 void fragment() {
-//	ALBEDO = COLOR.rgb;
 	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
 }
-
-//uniform float height;
-//uniform sampler2D heightMap;
-//uniform sampler2D imageTexture;
-//
-//varying vec3 color;
-//
-//void vertex() {
-//	float h = texture(heightMap, UV).g * height;
-//
-//	if (VERTEX.x >= 0.0){
-//		VERTEX.x += h;
-//	} else {
-//		VERTEX.x -= h;
-//	}
-//	if (VERTEX.y >= 0.0){
-//		VERTEX.y += h;
-//	} else {
-//		VERTEX.y -= h;
-//	}
-//	if (VERTEX.z >= 0.0){
-//		VERTEX.z += h;
-//	} else {
-//		VERTEX.z -= h;
-//	}
-//	color = texture(imageTexture, UV).rgb;
-//}
-//
-//void fragment() {
-//	ALBEDO = color;
-//}
-//
-//uniform vec3 diffuseComponent;
-//uniform vec3 specularComponent;
-//uniform float specularStrength;
-//uniform float shininess;
-//
-//void light() {
-//	DIFFUSE_LIGHT += max(dot(NORMAL, LIGHT), 0.0) * diffuseComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
-//	vec3 reflectDir = reflect(-LIGHT, NORMAL);
-//	float spec = pow(max(dot(-VIEW, reflectDir), 0.0), shininess);
-//	SPECULAR_LIGHT += specularStrength * spec * specularComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
-//}
 "
 
 [sub_resource type="ShaderMaterial" id=16]
