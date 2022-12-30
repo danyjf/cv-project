@@ -307,8 +307,8 @@ shader_param/ambientColor = Color( 0.356863, 0.305882, 0.141176, 1 )
 shader_param/ambientStrength = 0.2
 shader_param/diffuseColor = Color( 0.905882, 0.764706, 0.290196, 1 )
 shader_param/specularColor = Color( 0.901961, 0.862745, 0.729412, 1 )
-shader_param/specularStrength = 2.5
-shader_param/shininess = 5.0
+shader_param/specularStrength = 1.906
+shader_param/shininess = 10.941
 shader_param/height = 0.164
 shader_param/imageTexture = ExtResource( 17 )
 shader_param/heightMap = ExtResource( 18 )
@@ -375,6 +375,8 @@ uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 
+varying flat vec3 color;
+
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
 	if (VERTEX.x >= 0.0){
@@ -413,11 +415,11 @@ void vertex() {
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	vec4 specular = spec * specularStrength * specularColor * lightColor;
 	
-	COLOR = max(ambient, diffuse + specular);
+	color = max(ambient, diffuse + specular).rgb;
 }
 
 void fragment() {
-	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
+	ALBEDO = texture(imageTexture, UV).rgb * color;
 }
 "
 
@@ -439,14 +441,24 @@ radius = 1.08178
 
 [sub_resource type="Shader" id=18]
 code = "shader_type spatial;
+render_mode unshaded;
 
-uniform float height;
-uniform sampler2D heightMap;
 uniform sampler2D imageTexture;
+uniform sampler2D heightMap;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
+uniform float shininess : hint_range(0.0, 200.0) = 70;
+uniform float height : hint_range(0.0, 1.0) = 0.2;
+
+varying flat vec3 color;
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
-	
 	if (VERTEX.x >= 0.0){
 		VERTEX.x += h;
 	} else {
@@ -462,32 +474,71 @@ void vertex() {
 	} else {
 		VERTEX.z -= h;
 	}
-	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+	
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	color = max(ambient, diffuse + specular).rgb;
 }
 
 void fragment() {
-	ALBEDO = texture(imageTexture, UV).rgb;
-}"
+	ALBEDO = texture(imageTexture, UV).rgb * color;
+}
+"
 
 [sub_resource type="ShaderMaterial" id=19]
 shader = SubResource( 18 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.172549, 0.258824, 0.32549, 1 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.286275, 0.435294, 0.545098, 1 )
+shader_param/specularColor = Color( 0.721569, 0.772549, 0.807843, 1 )
+shader_param/specularStrength = 1.391
+shader_param/shininess = 6.04
 shader_param/height = 0.081
-shader_param/heightMap = ExtResource( 20 )
 shader_param/imageTexture = ExtResource( 25 )
+shader_param/heightMap = ExtResource( 20 )
 
 [sub_resource type="SphereShape" id=33]
 radius = 1.0754
 
 [sub_resource type="Shader" id=20]
 code = "shader_type spatial;
+render_mode unshaded;
 
-uniform float height;
-uniform sampler2D heightMap;
 uniform sampler2D imageTexture;
+uniform sampler2D heightMap;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
+uniform float shininess : hint_range(0.0, 200.0) = 70;
+uniform float height : hint_range(0.0, 1.0) = 0.2;
+
+varying flat vec3 color;
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
-	
 	if (VERTEX.x >= 0.0){
 		VERTEX.x += h;
 	} else {
@@ -503,18 +554,47 @@ void vertex() {
 	} else {
 		VERTEX.z -= h;
 	}
-	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+	
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	color = max(ambient, diffuse + specular).rgb;
 }
 
 void fragment() {
-	ALBEDO = texture(imageTexture, UV).rgb;
-}"
+	ALBEDO = texture(imageTexture, UV).rgb * color;
+}
+"
 
 [sub_resource type="ShaderMaterial" id=21]
 shader = SubResource( 20 )
-shader_param/height = -1.028
-shader_param/heightMap = ExtResource( 21 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.329412, 0.341176, 0.356863, 1 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.678431, 0.729412, 0.772549, 1 )
+shader_param/specularColor = Color( 0.776471, 0.776471, 0.776471, 1 )
+shader_param/specularStrength = 2.332
+shader_param/shininess = 6.634
+shader_param/height = 0.2
 shader_param/imageTexture = ExtResource( 22 )
+shader_param/heightMap = ExtResource( 21 )
 
 [sub_resource type="SphereShape" id=34]
 
