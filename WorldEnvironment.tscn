@@ -6,7 +6,6 @@
 [ext_resource path="res://textures/sun_texture.png" type="Texture" id=4]
 [ext_resource path="res://normal_maps/venus_normal.jpg" type="Texture" id=5]
 [ext_resource path="res://textures/earth_texture.jpg" type="Texture" id=6]
-[ext_resource path="res://normal_maps/mars_normal.jpg" type="Texture" id=7]
 [ext_resource path="res://textures/moon_texture.jpg" type="Texture" id=8]
 [ext_resource path="res://normal_maps/moon_normal.jpg" type="Texture" id=9]
 [ext_resource path="res://normal_maps/earth_normal.jpg" type="Texture" id=10]
@@ -105,20 +104,77 @@ normal_texture = ExtResource( 9 )
 
 [sub_resource type="SphereShape" id=28]
 
-[sub_resource type="SpatialMaterial" id=7]
-albedo_texture = ExtResource( 3 )
-normal_enabled = true
-normal_scale = 1.0
-normal_texture = ExtResource( 7 )
+[sub_resource type="Shader" id=36]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D imageTexture;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 5.0) = 2.0;
+uniform float shininess : hint_range(0.0, 200.0) = 15.0;
+
+void vertex() {
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	COLOR = max(ambient, diffuse + specular);
+}
+
+void fragment() {
+	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=37]
+shader = SubResource( 36 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.282353, 0.156863, 0.0313726, 1 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.796078, 0.329412, 0.203922, 1 )
+shader_param/specularColor = Color( 0.886275, 0.839216, 0.803922, 1 )
+shader_param/specularStrength = 2.743
+shader_param/shininess = 15.0
+shader_param/imageTexture = ExtResource( 3 )
 
 [sub_resource type="SphereShape" id=29]
 
 [sub_resource type="Shader" id=10]
 code = "shader_type spatial;
+render_mode unshaded;
 
-uniform float height;
-uniform sampler2D heightMap;
 uniform sampler2D imageTexture;
+uniform sampler2D heightMap;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 20.0) = 2.0;
+uniform float shininess : hint_range(0.0, 200.0) = 15.0;
+uniform float height : hint_range(0.0, 1.0) = 0.2;
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -137,29 +193,66 @@ void vertex() {
 	} else {
 		VERTEX.z -= h;
 	}
-	// VERTEX = MODELVIEW_MATRIX * VERTEX;
+	
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	COLOR = max(ambient, diffuse + specular);
 }
 
 void fragment() {
-	ALBEDO = texture(imageTexture, UV).rgb;
-}"
+	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
+}
+"
 
 [sub_resource type="ShaderMaterial" id=9]
 shader = SubResource( 10 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.372549, 0.294118, 0.137255, 1 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.584314, 0.458824, 0.207843, 1 )
+shader_param/specularColor = Color( 0.627451, 0.588235, 0.505882, 1 )
+shader_param/specularStrength = 10.544
+shader_param/shininess = 8.0
 shader_param/height = 0.065
-shader_param/heightMap = ExtResource( 15 )
 shader_param/imageTexture = ExtResource( 14 )
+shader_param/heightMap = ExtResource( 15 )
 
 [sub_resource type="SphereShape" id=30]
 radius = 1.0918
 
 [sub_resource type="Shader" id=11]
 code = "shader_type spatial;
+render_mode unshaded;
 
-uniform float height;
-uniform sampler2D heightMap;
 uniform sampler2D imageTexture;
-varying flat vec3 color;
+uniform sampler2D heightMap;
+
+uniform vec4 lightColor : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform vec4 ambientColor : hint_color = vec4(0.0215, 0.1745, 0.0215, 0.55);
+uniform float ambientStrength : hint_range(0.0, 5.0) = 0.2;
+uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
+uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
+uniform float specularStrength : hint_range(0.0, 20.0) = 2.0;
+uniform float shininess : hint_range(0.0, 200.0) = 15.0;
+uniform float height : hint_range(0.0, 1.0) = 0.2;
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -178,34 +271,47 @@ void vertex() {
 	} else {
 		VERTEX.z -= h;
 	}
-	color = texture(imageTexture, UV).rgb;
+	
+	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec3 worldViewerPos = CAMERA_MATRIX[3].xyz;
+	vec3 worldLightPos = vec3(0.0, 0.0, 0.0);
+	
+	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
+	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
+	vec3 reflectDir = reflect(-lightDir, normalDir);
+	
+	// ambient component
+    vec4 ambient = ambientStrength * ambientColor * lightColor;
+	
+	// diffuse component
+	float diff = max(dot(normalDir, lightDir), 0.0);
+   	vec4 diffuse = diff * diffuseColor * lightColor;
+	
+	// specular component
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	
+	COLOR = max(ambient, diffuse + specular);
 }
 
 void fragment() {
-	ALBEDO = color;
+	ALBEDO = texture(imageTexture, UV).rgb * COLOR.rgb;
 }
-
-uniform vec3 diffuseComponent;
-uniform vec3 specularComponent;
-uniform float specularStrength;
-uniform float shininess;
-
-void light() {
-	DIFFUSE_LIGHT += max(dot(NORMAL, LIGHT), 0.0) * diffuseComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
-	vec3 reflectDir = reflect(-LIGHT, NORMAL);
-	float spec = pow(max(dot(-VIEW, reflectDir), 0.0), shininess);
-	SPECULAR_LIGHT += specularStrength * spec * specularComponent * ALBEDO * ATTENUATION * LIGHT_COLOR;
-}"
+"
 
 [sub_resource type="ShaderMaterial" id=12]
 shader = SubResource( 11 )
+shader_param/lightColor = Color( 1, 1, 1, 1 )
+shader_param/ambientColor = Color( 0.356863, 0.305882, 0.141176, 1 )
+shader_param/ambientStrength = 0.2
+shader_param/diffuseColor = Color( 0.905882, 0.764706, 0.290196, 1 )
+shader_param/specularColor = Color( 0.901961, 0.862745, 0.729412, 1 )
+shader_param/specularStrength = 2.5
+shader_param/shininess = 5.0
 shader_param/height = 0.164
-shader_param/diffuseComponent = Vector3( 0.1, 0.1, 0.1 )
-shader_param/specularComponent = Vector3( 0, 0, 0 )
-shader_param/specularStrength = 0.5
-shader_param/shininess = 30.0
-shader_param/heightMap = ExtResource( 18 )
 shader_param/imageTexture = ExtResource( 17 )
+shader_param/heightMap = ExtResource( 18 )
 
 [sub_resource type="Shader" id=13]
 code = "shader_type spatial;
@@ -475,7 +581,7 @@ shape = SubResource( 25 )
 script = ExtResource( 31 )
 
 [node name="Venus" type="KinematicBody" parent="Position3D2"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 30.3317, 0, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 30.332, 0, 0 )
 script = ExtResource( 30 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Position3D2/Venus"]
@@ -523,7 +629,7 @@ script = ExtResource( 37 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Position3D5/Mars"]
 mesh = ExtResource( 2 )
-material/0 = SubResource( 7 )
+material/0 = SubResource( 37 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Position3D5/Mars"]
 shape = SubResource( 29 )
