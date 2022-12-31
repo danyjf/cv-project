@@ -1,4 +1,4 @@
-[gd_scene load_steps=83 format=2]
+[gd_scene load_steps=84 format=2]
 
 [ext_resource path="res://space.jpg" type="Texture" id=1]
 [ext_resource path="res://models/planet.obj" type="ArrayMesh" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://textures/sun_texture.png" type="Texture" id=4]
 [ext_resource path="res://normal_maps/venus_normal.jpg" type="Texture" id=5]
 [ext_resource path="res://textures/earth_texture.jpg" type="Texture" id=6]
+[ext_resource path="res://scripts/WorldCamera.gd" type="Script" id=7]
 [ext_resource path="res://textures/moon_texture.jpg" type="Texture" id=8]
 [ext_resource path="res://normal_maps/moon_normal.jpg" type="Texture" id=9]
 [ext_resource path="res://normal_maps/earth_normal.jpg" type="Texture" id=10]
@@ -56,6 +57,7 @@ panorama = ExtResource( 1 )
 [sub_resource type="Environment" id=2]
 background_mode = 2
 background_sky = SubResource( 1 )
+background_sky_custom_fov = 70.0
 glow_strength = 1.38
 glow_blend_mode = 1
 glow_bicubic_upscale = true
@@ -610,20 +612,24 @@ shadow_enabled = true
 spot_range = 42.9877
 spot_angle = 59.0625
 
-[node name="Ship" type="KinematicBody" parent="."]
+[node name="ShipPivot" type="Spatial" parent="."]
+
+[node name="Ship" type="KinematicBody" parent="ShipPivot"]
 transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 48.3604 )
 script = ExtResource( 49 )
 
-[node name="MeshInstance" type="MeshInstance" parent="Ship"]
+[node name="MeshInstance" type="MeshInstance" parent="ShipPivot/Ship"]
 mesh = ExtResource( 48 )
 material/0 = SubResource( 22 )
 
-[node name="CollisionShape" type="CollisionShape" parent="Ship"]
+[node name="CollisionShape" type="CollisionShape" parent="ShipPivot/Ship"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.980408, -1.71164 )
 shape = SubResource( 23 )
 
-[node name="Camera" type="ClippedCamera" parent="Ship"]
+[node name="Camera" type="ClippedCamera" parent="ShipPivot/Ship"]
 transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 5.01986, 14.7959 )
+current = true
+far = 300.0
 
 [node name="Sun" type="KinematicBody" parent="."]
 transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0 )
@@ -789,3 +795,10 @@ material/0 = SubResource( 21 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Position3D10/Pluto"]
 shape = SubResource( 34 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 117.915, 0 )
+projection = 1
+size = 200.0
+far = 200.0
+script = ExtResource( 7 )

@@ -8,17 +8,30 @@ var max_look_angle = 90.0
 var mouse_delta = Vector2()
 var velocity = Vector3.ZERO
 
+enum movement_mode {FREE_MODE, ORBIT_MODE}
+var current_mode = movement_mode.ORBIT_MODE
+onready var orbit_target = get_node("/root/WorldEnvironment/Sun")
+var orbit_pivot
+
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	orbit_pivot = get_parent()
 
 func _process(delta):
-	rotation_degrees.x -= mouse_delta.y * look_sensitivity * delta
-	rotation_degrees.x = clamp(rotation_degrees.x, min_look_angle, max_look_angle)
-	rotation_degrees.y -= mouse_delta.x * look_sensitivity * delta
-	
-	mouse_delta = Vector2.ZERO
+	match current_mode:
+		movement_mode.FREE_MODE:
+			free_camera(delta)
+		movement_mode.ORBIT_MODE:
+			orbit_camera(delta)
 
 func _physics_process(_delta):
+	match current_mode:
+		movement_mode.FREE_MODE:
+			free_movement()
+		movement_mode.ORBIT_MODE:
+			orbit_movement()
+
+func free_movement():
 	velocity = Vector3.ZERO
 	
 	var input = Vector2()
@@ -40,9 +53,26 @@ func _physics_process(_delta):
 
 	velocity = move_and_slide(velocity)
 
+func free_camera(delta):
+	rotation_degrees.x -= mouse_delta.y * look_sensitivity * delta
+	rotation_degrees.x = clamp(rotation_degrees.x, min_look_angle, max_look_angle)
+	rotation_degrees.y -= mouse_delta.x * look_sensitivity * delta
+	
+	mouse_delta = Vector2.ZERO
+
+func orbit_movement():
+	pass
+
+func orbit_camera(delta):
+	orbit_pivot.rotation_degrees.x += mouse_delta.y * look_sensitivity * delta
+	orbit_pivot.rotation_degrees.y += mouse_delta.x * look_sensitivity * delta
+	
+	mouse_delta = Vector2.ZERO
+
 func _input(event):
 	if event is InputEventMouseMotion:
 		mouse_delta = event.relative
+	
 	if Input.is_action_just_released("esc"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
