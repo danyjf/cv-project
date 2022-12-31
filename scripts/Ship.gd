@@ -1,5 +1,7 @@
 extends KinematicBody
 
+signal planet_selection
+
 export var move_speed = 100
 export var look_sensitivity = 5
 
@@ -9,7 +11,7 @@ var mouse_delta = Vector2()
 var velocity = Vector3.ZERO
 
 enum movement_mode {FREE_MODE, ORBIT_MODE}
-var current_mode = movement_mode.ORBIT_MODE
+var current_mode = movement_mode.FREE_MODE
 onready var orbit_target = get_node("/root/WorldEnvironment/Sun")
 var orbit_pivot
 
@@ -61,7 +63,7 @@ func free_camera(delta):
 	mouse_delta = Vector2.ZERO
 
 func orbit_movement():
-	pass
+	orbit_pivot.global_transform.origin = orbit_target.global_transform.origin
 
 func orbit_camera(delta):
 	orbit_pivot.rotation_degrees.x += mouse_delta.y * look_sensitivity * delta
@@ -74,7 +76,36 @@ func _input(event):
 		mouse_delta = event.relative
 	
 	if Input.is_action_just_released("esc"):
-		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		else:
-			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		emit_signal("planet_selection")
+
+func _on_PlanetButton_pressed(name):
+	$Camera.make_current()
+	match name:
+		"Mercury":
+			current_mode = movement_mode.ORBIT_MODE
+			orbit_target = get_node("/root/WorldEnvironment/Position3D/Mercury")
+			rotation_degrees.x = 0
+			rotation_degrees.y = 0
+			transform.origin.x = 0
+			transform.origin.y = 0
+			transform.origin.z = 5
+		"Venus":
+			pass
+		"Earth":
+			pass
+		"Mars":
+			pass
+		"Jupiter":
+			pass
+		"Saturn":
+			pass
+		"Uranus":
+			pass
+		"Neptune":
+			pass
+		"Pluto":
+			pass
+		"FreeMode":
+			current_mode = movement_mode.FREE_MODE
+			orbit_pivot.rotation_degrees.x = 0
+			orbit_pivot.rotation_degrees.y = 0

@@ -1,4 +1,4 @@
-[gd_scene load_steps=84 format=2]
+[gd_scene load_steps=85 format=2]
 
 [ext_resource path="res://space.jpg" type="Texture" id=1]
 [ext_resource path="res://models/planet.obj" type="ArrayMesh" id=2]
@@ -50,6 +50,7 @@
 [ext_resource path="res://models/Spaceship.obj" type="ArrayMesh" id=48]
 [ext_resource path="res://scripts/Ship.gd" type="Script" id=49]
 [ext_resource path="res://normal_maps/sun_normal.png" type="Texture" id=50]
+[ext_resource path="res://scripts/PlanetSelection.gd" type="Script" id=51]
 
 [sub_resource type="PanoramaSky" id=1]
 panorama = ExtResource( 1 )
@@ -603,6 +604,79 @@ shader_param/heightMap = ExtResource( 21 )
 [node name="WorldEnvironment" type="WorldEnvironment"]
 environment = SubResource( 2 )
 
+[node name="PlanetSelection" type="CanvasLayer" parent="."]
+script = ExtResource( 51 )
+
+[node name="Mercury" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 21.0
+margin_right = 160.0
+margin_bottom = 60.0
+text = "Mercury"
+
+[node name="Venus" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 60.0
+margin_right = 160.0
+margin_bottom = 99.0
+text = "Venus"
+
+[node name="Earth" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 99.0
+margin_right = 160.0
+margin_bottom = 138.0
+text = "Earth"
+
+[node name="Mars" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 138.0
+margin_right = 160.0
+margin_bottom = 177.0
+text = "Mars"
+
+[node name="Jupiter" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 177.0
+margin_right = 160.0
+margin_bottom = 216.0
+text = "Jupiter"
+
+[node name="Saturn" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 216.0
+margin_right = 160.0
+margin_bottom = 255.0
+text = "Saturn"
+
+[node name="Uranus" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 255.0
+margin_right = 160.0
+margin_bottom = 294.0
+text = "Uranus"
+
+[node name="Neptune" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 294.0
+margin_right = 160.0
+margin_bottom = 333.0
+text = "Neptune"
+
+[node name="Pluto" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 333.0
+margin_right = 160.0
+margin_bottom = 372.0
+text = "Pluto"
+
+[node name="FreeMode" type="Button" parent="PlanetSelection"]
+margin_left = 18.0
+margin_top = 372.0
+margin_right = 160.0
+margin_bottom = 411.0
+text = "Free Mode"
+
 [node name="TestLight (remove later)" type="SpotLight" parent="."]
 transform = Transform( -1.20829e-09, 1, 4.36947e-08, -0.0276425, -4.37114e-08, 0.999618, 0.999618, 0, 0.0276425, 71.915, 12.0939, 2.31034 )
 visible = false
@@ -613,9 +687,10 @@ spot_range = 42.9877
 spot_angle = 59.0625
 
 [node name="ShipPivot" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 44.8165 )
 
 [node name="Ship" type="KinematicBody" parent="ShipPivot"]
-transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 48.3604 )
+transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 8.51968 )
 script = ExtResource( 49 )
 
 [node name="MeshInstance" type="MeshInstance" parent="ShipPivot/Ship"]
@@ -802,3 +877,18 @@ projection = 1
 size = 200.0
 far = 200.0
 script = ExtResource( 7 )
+
+[connection signal="pressed" from="PlanetSelection/Mercury" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mercury" ]]
+[connection signal="pressed" from="PlanetSelection/Mercury" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Venus" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Earth" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Mars" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Jupiter" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Saturn" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Uranus" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Neptune" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Pluto" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/FreeMode" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "FreeMode" ]]
+[connection signal="pressed" from="PlanetSelection/FreeMode" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="planet_selection" from="ShipPivot/Ship" to="Camera" method="_on_Ship_planet_selection"]
+[connection signal="planet_selection" from="ShipPivot/Ship" to="PlanetSelection" method="_on_Ship_planet_selection"]
