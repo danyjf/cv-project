@@ -727,7 +727,7 @@ omni_range = 447.995
 [node name="Position3D" type="Position3D" parent="."]
 script = ExtResource( 28 )
 
-[node name="Mercury" type="KinematicBody" parent="Position3D"]
+[node name="Mercury" type="KinematicBody" parent="Position3D" groups=["planets"]]
 transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 25.4361, 0, 0 )
 script = ExtResource( 27 )
 
@@ -741,7 +741,7 @@ shape = SubResource( 25 )
 [node name="Position3D2" type="Position3D" parent="."]
 script = ExtResource( 31 )
 
-[node name="Venus" type="KinematicBody" parent="Position3D2"]
+[node name="Venus" type="KinematicBody" parent="Position3D2" groups=["planets"]]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 30.332, 0, 0 )
 script = ExtResource( 30 )
 
@@ -755,7 +755,7 @@ shape = SubResource( 26 )
 [node name="Position3D3" type="Position3D" parent="."]
 script = ExtResource( 32 )
 
-[node name="Earth" type="KinematicBody" parent="Position3D3"]
+[node name="Earth" type="KinematicBody" parent="Position3D3" groups=["planets"]]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 35.1163, 0, 0 )
 script = ExtResource( 33 )
 
@@ -784,7 +784,7 @@ shape = SubResource( 28 )
 [node name="Position3D5" type="Position3D" parent="."]
 script = ExtResource( 36 )
 
-[node name="Mars" type="KinematicBody" parent="Position3D5"]
+[node name="Mars" type="KinematicBody" parent="Position3D5" groups=["planets"]]
 transform = Transform( 0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 39.9321, 0, 0 )
 script = ExtResource( 37 )
 
@@ -798,7 +798,7 @@ shape = SubResource( 29 )
 [node name="Position3D6" type="Position3D" parent="."]
 script = ExtResource( 38 )
 
-[node name="Jupiter" type="KinematicBody" parent="Position3D6"]
+[node name="Jupiter" type="KinematicBody" parent="Position3D6" groups=["planets"]]
 transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 51.7395, 0, 0 )
 script = ExtResource( 39 )
 
@@ -812,7 +812,7 @@ shape = SubResource( 30 )
 [node name="Position3D7" type="Position3D" parent="."]
 script = ExtResource( 40 )
 
-[node name="Saturn" type="KinematicBody" parent="Position3D7"]
+[node name="Saturn" type="KinematicBody" parent="Position3D7" groups=["planets"]]
 transform = Transform( 4.5, 0, 0, 0, 4.5, 0, 0, 0, 4.5, 71.6055, 0, 0 )
 script = ExtResource( 41 )
 
@@ -832,7 +832,7 @@ shape = SubResource( 31 )
 [node name="Position3D8" type="Position3D" parent="."]
 script = ExtResource( 43 )
 
-[node name="Uranus" type="KinematicBody" parent="Position3D8"]
+[node name="Uranus" type="KinematicBody" parent="Position3D8" groups=["planets"]]
 transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 87.327, 0, 0 )
 script = ExtResource( 42 )
 
@@ -846,7 +846,7 @@ shape = SubResource( 32 )
 [node name="Position3D9" type="Position3D" parent="."]
 script = ExtResource( 44 )
 
-[node name="Neptune" type="KinematicBody" parent="Position3D9"]
+[node name="Neptune" type="KinematicBody" parent="Position3D9" groups=["planets"]]
 transform = Transform( 1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 93.2792, 0, 0 )
 script = ExtResource( 45 )
 
@@ -860,7 +860,7 @@ shape = SubResource( 33 )
 [node name="Position3D10" type="Position3D" parent="."]
 script = ExtResource( 46 )
 
-[node name="Pluto" type="KinematicBody" parent="Position3D10"]
+[node name="Pluto" type="KinematicBody" parent="Position3D10" groups=["planets"]]
 transform = Transform( 0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 98.784, 0, 0 )
 script = ExtResource( 47 )
 
@@ -878,17 +878,25 @@ size = 200.0
 far = 200.0
 script = ExtResource( 7 )
 
-[connection signal="pressed" from="PlanetSelection/Mercury" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mercury" ]]
+[connection signal="pressed" from="PlanetSelection/Mercury" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mercury", 1 ]]
 [connection signal="pressed" from="PlanetSelection/Mercury" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Venus" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Venus", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Venus" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Earth" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Earth", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Earth" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Mars" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mars", 1 ]]
 [connection signal="pressed" from="PlanetSelection/Mars" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Jupiter" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Jupiter", 6 ]]
 [connection signal="pressed" from="PlanetSelection/Jupiter" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Saturn" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Saturn", 11 ]]
 [connection signal="pressed" from="PlanetSelection/Saturn" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Uranus" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Uranus", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Uranus" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Neptune" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Neptune", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Neptune" to="PlanetSelection" method="_on_PlanetButton_pressed"]
+[connection signal="pressed" from="PlanetSelection/Pluto" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Pluto", 1 ]]
 [connection signal="pressed" from="PlanetSelection/Pluto" to="PlanetSelection" method="_on_PlanetButton_pressed"]
-[connection signal="pressed" from="PlanetSelection/FreeMode" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "FreeMode" ]]
+[connection signal="pressed" from="PlanetSelection/FreeMode" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "FreeMode", 0 ]]
 [connection signal="pressed" from="PlanetSelection/FreeMode" to="PlanetSelection" method="_on_PlanetButton_pressed"]
 [connection signal="planet_selection" from="ShipPivot/Ship" to="Camera" method="_on_Ship_planet_selection"]
 [connection signal="planet_selection" from="ShipPivot/Ship" to="PlanetSelection" method="_on_Ship_planet_selection"]

@@ -66,8 +66,9 @@ func orbit_movement():
 	orbit_pivot.global_transform.origin = orbit_target.global_transform.origin
 
 func orbit_camera(delta):
-	orbit_pivot.rotation_degrees.x += mouse_delta.y * look_sensitivity * delta
-	orbit_pivot.rotation_degrees.y += mouse_delta.x * look_sensitivity * delta
+	orbit_pivot.rotation_degrees.x -= mouse_delta.y * look_sensitivity * delta
+	orbit_pivot.rotation_degrees.x = clamp(orbit_pivot.rotation_degrees.x, min_look_angle, max_look_angle)
+	orbit_pivot.rotation_degrees.y -= mouse_delta.x * look_sensitivity * delta
 	
 	mouse_delta = Vector2.ZERO
 
@@ -78,34 +79,20 @@ func _input(event):
 	if Input.is_action_just_released("esc"):
 		emit_signal("planet_selection")
 
-func _on_PlanetButton_pressed(name):
+func _on_PlanetButton_pressed(name, distance):
 	$Camera.make_current()
-	match name:
-		"Mercury":
+	if name == "FreeMode":
+		current_mode = movement_mode.FREE_MODE
+		orbit_pivot.rotation_degrees.x = 0
+		orbit_pivot.rotation_degrees.y = 0
+		return
+	
+	for planet in get_tree().get_nodes_in_group("planets"):
+		if planet.name == name:
 			current_mode = movement_mode.ORBIT_MODE
-			orbit_target = get_node("/root/WorldEnvironment/Position3D/Mercury")
+			orbit_target = planet
 			rotation_degrees.x = 0
 			rotation_degrees.y = 0
 			transform.origin.x = 0
 			transform.origin.y = 0
-			transform.origin.z = 5
-		"Venus":
-			pass
-		"Earth":
-			pass
-		"Mars":
-			pass
-		"Jupiter":
-			pass
-		"Saturn":
-			pass
-		"Uranus":
-			pass
-		"Neptune":
-			pass
-		"Pluto":
-			pass
-		"FreeMode":
-			current_mode = movement_mode.FREE_MODE
-			orbit_pivot.rotation_degrees.x = 0
-			orbit_pivot.rotation_degrees.y = 0
+			transform.origin.z = distance
