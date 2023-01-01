@@ -120,6 +120,12 @@ uniform vec4 diffuseColor : hint_color = vec4(0.07568, 0.61424, 0.07568, 0.55);
 uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 5.0) = 2.0;
 uniform float shininess : hint_range(0.0, 200.0) = 15.0;
+uniform float spotMaxDist = 3.0;
+uniform float spotCutoff = 0.99;
+uniform vec3 spotPos1 = vec3(0.0);
+uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos2 = vec3(0.0);
+uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -128,21 +134,63 @@ void vertex() {
 	
 	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
 	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	
+	// calculate light from sun
 	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
 	vec3 reflectDir = reflect(-lightDir, normalDir);
 	
+	vec4 ambient = vec4(0.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 specular = vec4(0.0);
+	
 	// ambient component
-    vec4 ambient = ambientStrength * ambientColor * lightColor;
+    ambient = ambientStrength * ambientColor * lightColor;
 	
 	// diffuse component
 	float diff = max(dot(normalDir, lightDir), 0.0);
-   	vec4 diffuse = diff * diffuseColor * lightColor;
+   	diffuse = diff * diffuseColor * lightColor;
 	
 	// specular component
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	specular = spec * specularStrength * specularColor * lightColor;
 	
-	COLOR = max(ambient, diffuse + specular);
+	vec4 sunLight = max(ambient, diffuse + specular);
+	
+	// calculate light from spotlight 1	
+	vec4 spotLight1 = vec4(0.0);
+	lightDir = normalize(spotPos1 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight1 = max(ambient, diffuse + specular);
+	}
+	
+	// calculate light from spotlight 2
+	vec4 spotLight2 = vec4(0.0);
+	lightDir = normalize(spotPos2 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight2 = max(ambient, diffuse + specular);
+	}
+	
+	COLOR = sunLight + spotLight1 + spotLight2;
 }
 
 void fragment() {
@@ -159,6 +207,12 @@ shader_param/diffuseColor = Color( 0.796078, 0.329412, 0.203922, 1 )
 shader_param/specularColor = Color( 0.886275, 0.839216, 0.803922, 1 )
 shader_param/specularStrength = 2.743
 shader_param/shininess = 15.0
+shader_param/spotMaxDist = 3.0
+shader_param/spotCutoff = 0.99
+shader_param/spotPos1 = Vector3( 0, 0, 0 )
+shader_param/spotDir1 = Vector3( -1, 0, 0 )
+shader_param/spotPos2 = Vector3( 0, 0, 0 )
+shader_param/spotDir2 = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 3 )
 
 [sub_resource type="SphereShape" id=29]
@@ -178,6 +232,12 @@ uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 20.0) = 2.0;
 uniform float shininess : hint_range(0.0, 200.0) = 15.0;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
+uniform float spotMaxDist = 3.0;
+uniform float spotCutoff = 0.99;
+uniform vec3 spotPos1 = vec3(0.0);
+uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos2 = vec3(0.0);
+uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -203,21 +263,63 @@ void vertex() {
 	
 	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
 	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	
+	// calculate light from sun
 	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
 	vec3 reflectDir = reflect(-lightDir, normalDir);
 	
+	vec4 ambient = vec4(0.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 specular = vec4(0.0);
+	
 	// ambient component
-    vec4 ambient = ambientStrength * ambientColor * lightColor;
+    ambient = ambientStrength * ambientColor * lightColor;
 	
 	// diffuse component
 	float diff = max(dot(normalDir, lightDir), 0.0);
-   	vec4 diffuse = diff * diffuseColor * lightColor;
+   	diffuse = diff * diffuseColor * lightColor;
 	
 	// specular component
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	specular = spec * specularStrength * specularColor * lightColor;
 	
-	COLOR = max(ambient, diffuse + specular);
+	vec4 sunLight = max(ambient, diffuse + specular);
+	
+	// calculate light from spotlight 1	
+	vec4 spotLight1 = vec4(0.0);
+	lightDir = normalize(spotPos1 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight1 = max(ambient, diffuse + specular);
+	}
+	
+	// calculate light from spotlight 2
+	vec4 spotLight2 = vec4(0.0);
+	lightDir = normalize(spotPos2 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight2 = max(ambient, diffuse + specular);
+	}
+	
+	COLOR = sunLight + spotLight1 + spotLight2;
 }
 
 void fragment() {
@@ -235,6 +337,12 @@ shader_param/specularColor = Color( 0.627451, 0.588235, 0.505882, 1 )
 shader_param/specularStrength = 10.544
 shader_param/shininess = 8.0
 shader_param/height = 0.065
+shader_param/spotMaxDist = 8.0
+shader_param/spotCutoff = 0.99
+shader_param/spotPos1 = Vector3( 0, 0, 0 )
+shader_param/spotDir1 = Vector3( -1, 0, 0 )
+shader_param/spotPos2 = Vector3( 0, 0, 0 )
+shader_param/spotDir2 = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 14 )
 shader_param/heightMap = ExtResource( 15 )
 
@@ -256,6 +364,12 @@ uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 20.0) = 2.0;
 uniform float shininess : hint_range(0.0, 200.0) = 15.0;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
+uniform float spotMaxDist = 3.0;
+uniform float spotCutoff = 0.99;
+uniform vec3 spotPos1 = vec3(0.0);
+uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos2 = vec3(0.0);
+uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -281,21 +395,63 @@ void vertex() {
 	
 	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
 	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	
+	// calculate light from sun
 	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
 	vec3 reflectDir = reflect(-lightDir, normalDir);
 	
+	vec4 ambient = vec4(0.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 specular = vec4(0.0);
+	
 	// ambient component
-    vec4 ambient = ambientStrength * ambientColor * lightColor;
+    ambient = ambientStrength * ambientColor * lightColor;
 	
 	// diffuse component
 	float diff = max(dot(normalDir, lightDir), 0.0);
-   	vec4 diffuse = diff * diffuseColor * lightColor;
+   	diffuse = diff * diffuseColor * lightColor;
 	
 	// specular component
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	specular = spec * specularStrength * specularColor * lightColor;
 	
-	COLOR = max(ambient, diffuse + specular);
+	vec4 sunLight = max(ambient, diffuse + specular);
+	
+	// calculate light from spotlight 1	
+	vec4 spotLight1 = vec4(0.0);
+	lightDir = normalize(spotPos1 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight1 = max(ambient, diffuse + specular);
+	}
+	
+	// calculate light from spotlight 2
+	vec4 spotLight2 = vec4(0.0);
+	lightDir = normalize(spotPos2 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight2 = max(ambient, diffuse + specular);
+	}
+	
+	COLOR = sunLight + spotLight1 + spotLight2;
 }
 
 void fragment() {
@@ -313,6 +469,12 @@ shader_param/specularColor = Color( 0.901961, 0.862745, 0.729412, 1 )
 shader_param/specularStrength = 1.906
 shader_param/shininess = 10.941
 shader_param/height = 0.164
+shader_param/spotMaxDist = 10.0
+shader_param/spotCutoff = 0.99
+shader_param/spotPos1 = Vector3( 0, 0, 0 )
+shader_param/spotDir1 = Vector3( -1, 0, 0 )
+shader_param/spotPos2 = Vector3( 0, 0, 0 )
+shader_param/spotDir2 = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 17 )
 shader_param/heightMap = ExtResource( 18 )
 
@@ -510,6 +672,11 @@ uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
+uniform float spotMaxDist = 3.0;
+uniform vec3 spotPos1 = vec3(0.0);
+uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos2 = vec3(0.0);
+uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
 
 varying flat vec3 color;
 
@@ -537,21 +704,64 @@ void vertex() {
 	
 	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
 	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	
+	// calculate light from sun
 	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
 	vec3 reflectDir = reflect(-lightDir, normalDir);
 	
+	vec4 ambient = vec4(0.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 specular = vec4(0.0);
+	float spotCutoff = 0.95;
+	
 	// ambient component
-    vec4 ambient = ambientStrength * ambientColor * lightColor;
+    ambient = ambientStrength * ambientColor * lightColor;
 	
 	// diffuse component
 	float diff = max(dot(normalDir, lightDir), 0.0);
-   	vec4 diffuse = diff * diffuseColor * lightColor;
+   	diffuse = diff * diffuseColor * lightColor;
 	
 	// specular component
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	specular = spec * specularStrength * specularColor * lightColor;
 	
-	color = max(ambient, diffuse + specular).rgb;
+	vec3 sunLight = max(ambient, diffuse + specular).rgb;
+	
+	// calculate light from spotlight 1	
+	vec3 spotLight1 = vec3(0.0);
+	lightDir = normalize(spotPos1 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight1 = max(ambient, diffuse + specular).rgb;
+	}
+	
+	// calculate light from spotlight 2
+	vec3 spotLight2 = vec3(0.0);
+	lightDir = normalize(spotPos2 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight2 = max(ambient, diffuse + specular).rgb;
+	}
+	
+	color = sunLight + spotLight1 + spotLight2;
 }
 
 void fragment() {
@@ -569,6 +779,11 @@ shader_param/specularColor = Color( 0.721569, 0.772549, 0.807843, 1 )
 shader_param/specularStrength = 1.391
 shader_param/shininess = 6.04
 shader_param/height = 0.081
+shader_param/spotMaxDist = 3.0
+shader_param/spotPos1 = Vector3( 0, 0, 0 )
+shader_param/spotDir1 = Vector3( -1, 0, 0 )
+shader_param/spotPos2 = Vector3( 0, 0, 0 )
+shader_param/spotDir2 = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 25 )
 shader_param/heightMap = ExtResource( 20 )
 
@@ -590,6 +805,11 @@ uniform vec4 specularColor : hint_color = vec4(0.633, 0.727811, 0.633, 0.55);
 uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
+uniform float spotMaxDist = 3.0;
+uniform vec3 spotPos1 = vec3(0.0);
+uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos2 = vec3(0.0);
+uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
 
 varying flat vec3 color;
 
@@ -617,21 +837,64 @@ void vertex() {
 	
 	vec3 viewDir = normalize(worldViewerPos - worldVertexPos);
 	vec3 normalDir = normalize(mat3(transpose(inverse(WORLD_MATRIX))) * NORMAL);
+	
+	// calculate light from sun
 	vec3 lightDir = normalize(worldLightPos - worldVertexPos);
 	vec3 reflectDir = reflect(-lightDir, normalDir);
 	
+	vec4 ambient = vec4(0.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 specular = vec4(0.0);
+	float spotCutoff = 0.95;
+	
 	// ambient component
-    vec4 ambient = ambientStrength * ambientColor * lightColor;
+    ambient = ambientStrength * ambientColor * lightColor;
 	
 	// diffuse component
 	float diff = max(dot(normalDir, lightDir), 0.0);
-   	vec4 diffuse = diff * diffuseColor * lightColor;
+   	diffuse = diff * diffuseColor * lightColor;
 	
 	// specular component
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec4 specular = spec * specularStrength * specularColor * lightColor;
+	specular = spec * specularStrength * specularColor * lightColor;
 	
-	color = max(ambient, diffuse + specular).rgb;
+	vec3 sunLight = max(ambient, diffuse + specular).rgb;
+	
+	// calculate light from spotlight 1	
+	vec3 spotLight1 = vec3(0.0);
+	lightDir = normalize(spotPos1 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight1 = max(ambient, diffuse + specular).rgb;
+	}
+	
+	// calculate light from spotlight 2
+	vec3 spotLight2 = vec3(0.0);
+	lightDir = normalize(spotPos2 - worldVertexPos);
+	reflectDir = reflect(-lightDir, normalDir);
+	
+	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+		// diffuse component
+		diff = max(dot(normalDir, lightDir), 0.0);
+	   	diffuse = diff * diffuseColor * lightColor;
+		
+		// specular component
+		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+		specular = spec * specularStrength * specularColor * lightColor;
+		
+		spotLight2 = max(ambient, diffuse + specular).rgb;
+	}
+	
+	color = sunLight + spotLight1 + spotLight2;
 }
 
 void fragment() {
@@ -649,6 +912,11 @@ shader_param/specularColor = Color( 0.776471, 0.776471, 0.776471, 1 )
 shader_param/specularStrength = 2.332
 shader_param/shininess = 6.634
 shader_param/height = 0.2
+shader_param/spotMaxDist = 3.0
+shader_param/spotPos1 = Vector3( 0, 0, 0 )
+shader_param/spotDir1 = Vector3( -1, 0, 0 )
+shader_param/spotPos2 = Vector3( 0, 0, 0 )
+shader_param/spotDir2 = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 22 )
 shader_param/heightMap = ExtResource( 21 )
 
@@ -949,9 +1217,9 @@ shape = SubResource( 34 )
 [connection signal="pressed" from="PlanetSelection/Earth" to="PlanetSelection" method="_on_PlanetButton_pressed"]
 [connection signal="pressed" from="PlanetSelection/Earth" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Earth", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Mars" to="PlanetSelection" method="_on_PlanetButton_pressed"]
-[connection signal="pressed" from="PlanetSelection/Mars" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mars", 1 ]]
+[connection signal="pressed" from="PlanetSelection/Mars" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Mars", 2 ]]
 [connection signal="pressed" from="PlanetSelection/Jupiter" to="PlanetSelection" method="_on_PlanetButton_pressed"]
-[connection signal="pressed" from="PlanetSelection/Jupiter" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Jupiter", 6 ]]
+[connection signal="pressed" from="PlanetSelection/Jupiter" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Jupiter", 9 ]]
 [connection signal="pressed" from="PlanetSelection/Saturn" to="PlanetSelection" method="_on_PlanetButton_pressed"]
 [connection signal="pressed" from="PlanetSelection/Saturn" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Saturn", 11 ]]
 [connection signal="pressed" from="PlanetSelection/Uranus" to="PlanetSelection" method="_on_PlanetButton_pressed"]
@@ -959,7 +1227,7 @@ shape = SubResource( 34 )
 [connection signal="pressed" from="PlanetSelection/Neptune" to="PlanetSelection" method="_on_PlanetButton_pressed"]
 [connection signal="pressed" from="PlanetSelection/Neptune" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Neptune", 3 ]]
 [connection signal="pressed" from="PlanetSelection/Pluto" to="PlanetSelection" method="_on_PlanetButton_pressed"]
-[connection signal="pressed" from="PlanetSelection/Pluto" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Pluto", 1 ]]
+[connection signal="pressed" from="PlanetSelection/Pluto" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "Pluto", 2 ]]
 [connection signal="pressed" from="PlanetSelection/FreeMode" to="PlanetSelection" method="_on_PlanetButton_pressed"]
 [connection signal="pressed" from="PlanetSelection/FreeMode" to="ShipPivot/Ship" method="_on_PlanetButton_pressed" binds= [ "FreeMode", 0 ]]
 [connection signal="planet_selection" from="ShipPivot/Ship" to="PlanetSelection" method="_on_Ship_planet_selection"]

@@ -27,7 +27,7 @@ func _process(delta):
 			orbit_camera(delta)
 	
 	for planet in get_tree().get_nodes_in_group("planets"):
-		if planet.name == "Uranus":
+		if planet.name != "Mercury" and planet.name != "Venus" and planet.name != "Earth":
 			var material = planet.get_node("MeshInstance").get_surface_material(0)
 			
 			# send spotlight1 data to shader
