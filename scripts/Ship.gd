@@ -25,6 +25,18 @@ func _process(delta):
 			free_camera(delta)
 		movement_mode.ORBIT_MODE:
 			orbit_camera(delta)
+	
+	for planet in get_tree().get_nodes_in_group("planets"):
+		if planet.name == "Uranus":
+			var material = planet.get_node("MeshInstance").get_surface_material(0)
+			
+			# send spotlight1 data to shader
+			material.set_shader_param("spotPos1", $SpotLight.global_transform.origin)
+			material.set_shader_param("spotDir1", $SpotLight.global_transform.basis.z)
+			
+			# send spotlight2 data to shader
+			material.set_shader_param("spotPos2", $SpotLight2.global_transform.origin)
+			material.set_shader_param("spotDir2", $SpotLight2.global_transform.basis.z)
 
 func _physics_process(_delta):
 	match current_mode:
