@@ -31,12 +31,8 @@ func _process(delta):
 			var material = planet.get_node("MeshInstance").get_surface_material(0)
 			
 			# send spotlight1 data to shader
-			material.set_shader_param("spotPos1", $SpotLight.global_transform.origin)
-			material.set_shader_param("spotDir1", $SpotLight.global_transform.basis.z)
-			
-			# send spotlight2 data to shader
-			material.set_shader_param("spotPos2", $SpotLight2.global_transform.origin)
-			material.set_shader_param("spotDir2", $SpotLight2.global_transform.basis.z)
+			material.set_shader_param("spotPos", $SpotLight.global_transform.origin)
+			material.set_shader_param("spotDir", $SpotLight.global_transform.basis.z)
 
 func _physics_process(_delta):
 	match current_mode:

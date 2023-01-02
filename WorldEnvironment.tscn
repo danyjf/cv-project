@@ -47,7 +47,7 @@
 [ext_resource path="res://scripts/Neptune.gd" type="Script" id=45]
 [ext_resource path="res://scripts/Position3D10.gd" type="Script" id=46]
 [ext_resource path="res://scripts/Pluto.gd" type="Script" id=47]
-[ext_resource path="res://models/Spaceship.obj" type="ArrayMesh" id=48]
+[ext_resource path="res://models/ship.obj" type="ArrayMesh" id=48]
 [ext_resource path="res://scripts/Ship.gd" type="Script" id=49]
 [ext_resource path="res://normal_maps/sun_normal.png" type="Texture" id=50]
 [ext_resource path="res://scripts/PlanetSelection.gd" type="Script" id=51]
@@ -63,15 +63,15 @@ glow_strength = 1.38
 glow_blend_mode = 1
 glow_bicubic_upscale = true
 
+[sub_resource type="BoxShape" id=23]
+extents = Vector3( 1.52759, 1.48515, 2.31536 )
+
 [sub_resource type="SpatialMaterial" id=22]
 params_diffuse_mode = 4
 albedo_texture = ExtResource( 4 )
 normal_enabled = true
 normal_scale = 16.0
 normal_texture = ExtResource( 50 )
-
-[sub_resource type="BoxShape" id=23]
-extents = Vector3( 2.72508, 1.48515, 3.61304 )
 
 [sub_resource type="SphereShape" id=24]
 
@@ -122,10 +122,8 @@ uniform float specularStrength : hint_range(0.0, 5.0) = 2.0;
 uniform float shininess : hint_range(0.0, 200.0) = 15.0;
 uniform float spotMaxDist = 3.0;
 uniform float spotCutoff = 0.99;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	vec3 worldVertexPos = (WORLD_MATRIX * vec4(VERTEX, 1.0)).xyz;
@@ -156,12 +154,12 @@ void vertex() {
 	
 	vec4 sunLight = max(ambient, diffuse + specular);
 	
-	// calculate light from spotlight 1	
-	vec4 spotLight1 = vec4(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec4 spotLight = vec4(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -170,27 +168,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular);
+		spotLight = max(ambient, diffuse + specular);
 	}
 	
-	// calculate light from spotlight 2
-	vec4 spotLight2 = vec4(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular);
-	}
-	
-	COLOR = sunLight + spotLight1 + spotLight2;
+	COLOR = sunLight + spotLight;
 }
 
 void fragment() {
@@ -209,10 +190,8 @@ shader_param/specularStrength = 2.743
 shader_param/shininess = 15.0
 shader_param/spotMaxDist = 3.0
 shader_param/spotCutoff = 0.99
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 3 )
 
 [sub_resource type="SphereShape" id=29]
@@ -234,10 +213,8 @@ uniform float shininess : hint_range(0.0, 200.0) = 15.0;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 uniform float spotMaxDist = 3.0;
 uniform float spotCutoff = 0.99;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -285,12 +262,12 @@ void vertex() {
 	
 	vec4 sunLight = max(ambient, diffuse + specular);
 	
-	// calculate light from spotlight 1	
-	vec4 spotLight1 = vec4(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec4 spotLight = vec4(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -299,27 +276,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular);
+		spotLight = max(ambient, diffuse + specular);
 	}
 	
-	// calculate light from spotlight 2
-	vec4 spotLight2 = vec4(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular);
-	}
-	
-	COLOR = sunLight + spotLight1 + spotLight2;
+	COLOR = sunLight + spotLight;
 }
 
 void fragment() {
@@ -339,10 +299,8 @@ shader_param/shininess = 8.0
 shader_param/height = 0.065
 shader_param/spotMaxDist = 8.0
 shader_param/spotCutoff = 0.99
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 14 )
 shader_param/heightMap = ExtResource( 15 )
 
@@ -366,10 +324,8 @@ uniform float shininess : hint_range(0.0, 200.0) = 15.0;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 uniform float spotMaxDist = 3.0;
 uniform float spotCutoff = 0.99;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 void vertex() {
 	float h = texture(heightMap, UV).g * height;
@@ -417,12 +373,12 @@ void vertex() {
 	
 	vec4 sunLight = max(ambient, diffuse + specular);
 	
-	// calculate light from spotlight 1	
-	vec4 spotLight1 = vec4(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec4 spotLight = vec4(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -431,27 +387,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular);
+		spotLight = max(ambient, diffuse + specular);
 	}
 	
-	// calculate light from spotlight 2
-	vec4 spotLight2 = vec4(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular);
-	}
-	
-	COLOR = sunLight + spotLight1 + spotLight2;
+	COLOR = sunLight + spotLight;
 }
 
 void fragment() {
@@ -471,10 +410,8 @@ shader_param/shininess = 10.941
 shader_param/height = 0.164
 shader_param/spotMaxDist = 10.0
 shader_param/spotCutoff = 0.99
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 17 )
 shader_param/heightMap = ExtResource( 18 )
 
@@ -540,10 +477,8 @@ uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 uniform float spotMaxDist = 3.0;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 varying flat vec3 color;
 
@@ -594,12 +529,12 @@ void vertex() {
 	
 	vec3 sunLight = max(ambient, diffuse + specular).rgb;
 	
-	// calculate light from spotlight 1	
-	vec3 spotLight1 = vec3(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec3 spotLight = vec3(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -608,27 +543,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular).rgb;
+		spotLight = max(ambient, diffuse + specular).rgb;
 	}
 	
-	// calculate light from spotlight 2
-	vec3 spotLight2 = vec3(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular).rgb;
-	}
-	
-	color = sunLight + spotLight1 + spotLight2;
+	color = sunLight + spotLight;
 }
 
 void fragment() {
@@ -647,10 +565,8 @@ shader_param/specularStrength = 2.0
 shader_param/shininess = 15.0
 shader_param/height = 0.3
 shader_param/spotMaxDist = 3.0
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 23 )
 shader_param/heightMap = ExtResource( 24 )
 
@@ -673,10 +589,8 @@ uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 uniform float spotMaxDist = 3.0;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 varying flat vec3 color;
 
@@ -727,12 +641,12 @@ void vertex() {
 	
 	vec3 sunLight = max(ambient, diffuse + specular).rgb;
 	
-	// calculate light from spotlight 1	
-	vec3 spotLight1 = vec3(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec3 spotLight = vec3(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -741,27 +655,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular).rgb;
+		spotLight = max(ambient, diffuse + specular).rgb;
 	}
 	
-	// calculate light from spotlight 2
-	vec3 spotLight2 = vec3(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular).rgb;
-	}
-	
-	color = sunLight + spotLight1 + spotLight2;
+	color = sunLight + spotLight;
 }
 
 void fragment() {
@@ -780,10 +677,8 @@ shader_param/specularStrength = 1.391
 shader_param/shininess = 6.04
 shader_param/height = 0.081
 shader_param/spotMaxDist = 3.0
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 25 )
 shader_param/heightMap = ExtResource( 20 )
 
@@ -806,10 +701,8 @@ uniform float specularStrength : hint_range(0.0, 5.0) = 0.5;
 uniform float shininess : hint_range(0.0, 200.0) = 70;
 uniform float height : hint_range(0.0, 1.0) = 0.2;
 uniform float spotMaxDist = 3.0;
-uniform vec3 spotPos1 = vec3(0.0);
-uniform vec3 spotDir1 = vec3(-1.0, 0.0, 0.0);
-uniform vec3 spotPos2 = vec3(0.0);
-uniform vec3 spotDir2 = vec3(-1.0, 0.0, 0.0);
+uniform vec3 spotPos = vec3(0.0);
+uniform vec3 spotDir = vec3(-1.0, 0.0, 0.0);
 
 varying flat vec3 color;
 
@@ -860,12 +753,12 @@ void vertex() {
 	
 	vec3 sunLight = max(ambient, diffuse + specular).rgb;
 	
-	// calculate light from spotlight 1	
-	vec3 spotLight1 = vec3(0.0);
-	lightDir = normalize(spotPos1 - worldVertexPos);
+	// calculate light from spotlight
+	vec3 spotLight = vec3(0.0);
+	lightDir = normalize(spotPos - worldVertexPos);
 	reflectDir = reflect(-lightDir, normalDir);
 	
-	if (dot(lightDir, spotDir1) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
+	if (dot(lightDir, spotDir) > spotCutoff && distance(worldVertexPos, spotPos) < spotMaxDist) {
 		// diffuse component
 		diff = max(dot(normalDir, lightDir), 0.0);
 	   	diffuse = diff * diffuseColor * lightColor;
@@ -874,27 +767,10 @@ void vertex() {
 		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 		specular = spec * specularStrength * specularColor * lightColor;
 		
-		spotLight1 = max(ambient, diffuse + specular).rgb;
+		spotLight = max(ambient, diffuse + specular).rgb;
 	}
 	
-	// calculate light from spotlight 2
-	vec3 spotLight2 = vec3(0.0);
-	lightDir = normalize(spotPos2 - worldVertexPos);
-	reflectDir = reflect(-lightDir, normalDir);
-	
-	if (dot(lightDir, spotDir2) > spotCutoff && distance(worldVertexPos, spotPos1) < spotMaxDist) {
-		// diffuse component
-		diff = max(dot(normalDir, lightDir), 0.0);
-	   	diffuse = diff * diffuseColor * lightColor;
-		
-		// specular component
-		spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-		specular = spec * specularStrength * specularColor * lightColor;
-		
-		spotLight2 = max(ambient, diffuse + specular).rgb;
-	}
-	
-	color = sunLight + spotLight1 + spotLight2;
+	color = sunLight + spotLight;
 }
 
 void fragment() {
@@ -913,10 +789,8 @@ shader_param/specularStrength = 2.332
 shader_param/shininess = 6.634
 shader_param/height = 0.2
 shader_param/spotMaxDist = 3.0
-shader_param/spotPos1 = Vector3( 0, 0, 0 )
-shader_param/spotDir1 = Vector3( -1, 0, 0 )
-shader_param/spotPos2 = Vector3( 0, 0, 0 )
-shader_param/spotDir2 = Vector3( -1, 0, 0 )
+shader_param/spotPos = Vector3( 0, 0, 0 )
+shader_param/spotDir = Vector3( -1, 0, 0 )
 shader_param/imageTexture = ExtResource( 22 )
 shader_param/heightMap = ExtResource( 21 )
 
@@ -1013,11 +887,11 @@ transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 8.51968 )
 script = ExtResource( 49 )
 
 [node name="MeshInstance" type="MeshInstance" parent="ShipPivot/Ship"]
+transform = Transform( -4.37114e-08, 0, -1, 1, -4.37114e-08, -4.37114e-08, -4.37114e-08, -1, 1.91069e-15, 0, 0, 0 )
 mesh = ExtResource( 48 )
-material/0 = SubResource( 22 )
 
 [node name="CollisionShape" type="CollisionShape" parent="ShipPivot/Ship"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.980408, -1.71164 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.980408, 0.0841064 )
 shape = SubResource( 23 )
 
 [node name="Camera" type="ClippedCamera" parent="ShipPivot/Ship"]
@@ -1026,14 +900,9 @@ current = true
 far = 300.0
 
 [node name="SpotLight" type="SpotLight" parent="ShipPivot/Ship"]
-transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, -1.75706, 0.575515, -3.34467 )
+transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, -0.00372276, -0.028636, -2.28638 )
 spot_range = 3.584
 spot_angle = 10.01
-
-[node name="SpotLight2" type="SpotLight" parent="ShipPivot/Ship"]
-transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 1.76, 0.576, -3.345 )
-spot_range = 3.58357
-spot_angle = 10.0976
 
 [node name="Sun" type="KinematicBody" parent="."]
 transform = Transform( 20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0 )
